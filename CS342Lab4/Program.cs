@@ -12,10 +12,22 @@ namespace CS342Lab4
     {
         static void Main(string[] args)
         {
+            // Command Line Arguments
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Please enter two file paths.");
+                return;
+            }
+
+            //Console.WriteLine("Please enter a file path to evaluate: ");
+            string filePath1 = args[0];//Console.ReadLine();
+            //Console.WriteLine("Please enter a file for the report: ");
+            string filePath2 = args[1];//Console.ReadLine();
+
             // Writes the report to the console.
-            Console.WriteLine(CreateReport(EnumerateFilesRecursively("D:\\CS342Lab4")));
+            Console.WriteLine(CreateReport(EnumerateFilesRecursively(filePath1)));//"D:\\CS342Lab4"
             // Saves the report to the specified path.
-            CreateReport(EnumerateFilesRecursively("D:\\CS342Lab4")).Save("D:\\CS342Lab4\\index.html");
+            CreateReport(EnumerateFilesRecursively(filePath1)).Save(filePath2);//"D:\\CS342Lab4" "D:\\CS342Lab4\\index.html"
             // Pauses the console.
             Console.ReadLine();
         }
@@ -37,9 +49,131 @@ namespace CS342Lab4
                 yield return s;
         }
 
+        // Format a byte size in human readable form.
+        // B, kB, MB, GB, TB, PB, EB, and ZB where 1kB = 1000B, etc.
+        // The numerical value should be greater or equal to 1, less than 1000,
+        // and rounded to 2 digits after the decimal point. (e.g. "1.30kB")
         static string FormatByteSize(long byteSize)
         {
-            return "";
+            long size = byteSize;
+            long decimalPoint = 0;
+            string leadingZero = "";
+            string sizeIndicator = "";
+
+            // Change to kB if able.
+            if (size > 1000)
+            {
+                decimalPoint = byteSize % 1000;
+                size = byteSize / 1000;
+
+                if (decimalPoint % 10 < 5)
+                    decimalPoint = decimalPoint / 10;
+                else
+                    decimalPoint = (decimalPoint / 10) + 1;
+
+                if (decimalPoint < 10)
+                    leadingZero = "0";
+                else
+                    leadingZero = "";
+
+                sizeIndicator = "kB";
+            }
+            else
+            {
+                sizeIndicator = "B";
+            }
+            // Format to MB if able.
+            if (size > 1000)
+            {
+                decimalPoint = size % 1000;
+                size = size / 1000;
+
+                if (decimalPoint % 10 < 5)
+                    decimalPoint = decimalPoint / 10;
+                else
+                    decimalPoint = (decimalPoint / 10) + 1;
+
+                if (decimalPoint < 10)
+                    leadingZero = "0";
+                else
+                    leadingZero = "";
+
+                sizeIndicator = "MB";
+            }
+            // Format to GB if able.
+            if (size > 1000)
+            {
+                decimalPoint = size % 1000;
+                size = size / 1000;
+
+                if (decimalPoint % 10 < 5)
+                    decimalPoint = decimalPoint / 10;
+                else
+                    decimalPoint = (decimalPoint / 10) + 1;
+
+                if (decimalPoint < 10)
+                    leadingZero = "0";
+                else
+                    leadingZero = "";
+
+                sizeIndicator = "TB";
+            }
+            // Format to PB if able.
+            if (size > 1000)
+            {
+                decimalPoint = size % 1000;
+                size = size / 1000;
+
+                if (decimalPoint % 10 < 5)
+                    decimalPoint = decimalPoint / 10;
+                else
+                    decimalPoint = (decimalPoint / 10) + 1;
+
+                if (decimalPoint < 10)
+                    leadingZero = "0";
+                else
+                    leadingZero = "";
+
+                sizeIndicator = "PB";
+            }
+            // Format to EB if able.
+            if (size > 1000)
+            {
+                decimalPoint = size % 1000;
+                size = size / 1000;
+
+                if (decimalPoint % 10 < 5)
+                    decimalPoint = decimalPoint / 10;
+                else
+                    decimalPoint = (decimalPoint / 10) + 1;
+
+                if (decimalPoint < 10)
+                    leadingZero = "0";
+                else
+                    leadingZero = "";
+
+                sizeIndicator = "EB";
+            }
+            // Format to ZB if able.
+            if (size > 1000)
+            {
+                decimalPoint = size % 1000;
+                size = size / 1000;
+
+                if (decimalPoint % 10 < 5)
+                    decimalPoint = decimalPoint / 10;
+                else
+                    decimalPoint = (decimalPoint / 10) + 1;
+
+                if (decimalPoint < 10)
+                    leadingZero = "0";
+                else
+                    leadingZero = "";
+
+                sizeIndicator = "ZB";
+            }
+
+            return size.ToString() + "." + leadingZero + decimalPoint.ToString() + sizeIndicator;
         }
 
         // Create a HTML document containing a table with 3 columns:
@@ -58,9 +192,9 @@ namespace CS342Lab4
                 // Create a row per file extension group. (Descending order based on "Size")
                 from f in files.AsEnumerable().GroupBy(file => Path.GetExtension(file)).OrderBy(a => a.Sum(file => new FileInfo(file).Length)).Reverse() select
                     new XElement("tr",
+                        new XElement("td", f.Key.ToLower()), 
                         new XElement("td", f.Count()),
-                        new XElement("td", f.Key),
-                        new XElement("td", f.Sum(file => new FileInfo(file).Length)))));
+                        new XElement("td", FormatByteSize(f.Sum(file => new FileInfo(file).Length))))));
         }
     }
 }
